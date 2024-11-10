@@ -41,27 +41,31 @@ def main(config, fold_id):
     model.apply(weights_init_normal)
     logger.info(model)
 
-    # get function handles of loss and metrics
+    # Loss function and metrics
     criterion = getattr(module_loss, config['loss'])
     metrics = [getattr(module_metric, met) for met in config['metrics']]
 
     # build optimizer
     trainable_params = filter(lambda p: p.requires_grad, model.parameters())
-
     optimizer = config.init_obj('optimizer', torch.optim, trainable_params)
 
-    data_loader, valid_data_loader, data_count = data_generator_np(folds_data[fold_id][0],
-                                                                   folds_data[fold_id][1], batch_size)
-    weights_for_each_class = calc_class_weight(data_count)
+    # Load data with SMOTE integration
+    data_loader, valid_data_loader, data_count = data_generator_np(
+        folds_data[fold_id][0], folds_data[fold_id][1], batch_size
+    )
 
-    trainer = Trainer(model, criterion, metrics, optimizer,
-                      config=config,
-                      data_loader=data_loader,
-                      fold_id=fold_id,
-                      valid_data_loader=valid_data_loader,
-                      class_weights=weights_for_each_class)
+    # Initialize Trainer with SMOTE-processed data
+    trainer = Trainer(
+        model, criterion, metrics, optimizer,
+        config=config,
+        data_loader=data_loader,
+        fold_id=fold_id,
+        valid_data_loader=valid_data_loader,
+        class_weights=None
+    )
 
     trainer.train()
+
 
 
 if __name__ == '__main__':
