@@ -35,17 +35,22 @@ class LoadDataset_from_numpy(Dataset):
         return self.len
 
 
-
-
 def data_generator_np(training_files, subject_files, batch_size):
     # Load the datasets
     train_dataset = LoadDataset_from_numpy(training_files)
     test_dataset = LoadDataset_from_numpy(subject_files)
 
-    # Apply SMOTE to oversample minority class in the training data
+    # Reshape X_train to 2D before applying SMOTE
     X_train, y_train = train_dataset.x_data.numpy(), train_dataset.y_data.numpy()
+    n_samples, n_channels, seq_len = X_train.shape
+    X_train_2d = X_train.reshape(n_samples, n_channels * seq_len)
+
+    # Apply SMOTE to the 2D reshaped data
     smote = SMOTE(random_state=42)
-    X_train_oversampled, y_train_oversampled = smote.fit_resample(X_train, y_train)
+    X_train_oversampled, y_train_oversampled = smote.fit_resample(X_train_2d, y_train)
+
+    # Reshape back to 3D after SMOTE
+    X_train_oversampled = X_train_oversampled.reshape(-1, n_channels, seq_len)
 
     # Convert back to PyTorch tensors
     train_dataset.x_data = torch.from_numpy(X_train_oversampled).float()
