@@ -46,6 +46,10 @@ def data_generator_np(training_files, subject_files, batch_size):
     # Apply SMOTE
     X_resampled, y_resampled = apply_smote(X_train, y_train)
 
+    # Calculate data_count for class weights (optional, depending on requirements)
+    unique, counts = np.unique(y_resampled, return_counts=True)
+    data_count = dict(zip(unique, counts))
+
     # Create train dataset with SMOTE
     train_dataset = LoadDataset_from_numpy(X_resampled, y_resampled)
     train_loader = torch.utils.data.DataLoader(dataset=train_dataset,
@@ -61,7 +65,7 @@ def data_generator_np(training_files, subject_files, batch_size):
         data = np.load(np_file)
         X_test.append(data["x"])
         y_test.append(data["y"])
-    
+
     X_test = np.vstack(X_test)
     y_test = np.concatenate(y_test)
 
@@ -72,4 +76,4 @@ def data_generator_np(training_files, subject_files, batch_size):
                                               drop_last=False,
                                               num_workers=0)
 
-    return train_loader, test_loader
+    return train_loader, test_loader, data_count
