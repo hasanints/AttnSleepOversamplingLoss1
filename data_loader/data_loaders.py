@@ -57,7 +57,14 @@ def apply_bd_smote(X_train, y_train):
     
     return X_resampled, y_resampled
 
-
+# def apply_smote(X_train, y_train):
+#     # Reshape X_train from (841, 3000, 1) to (841, 3000) for SMOTE
+#     X_train_reshaped = X_train.reshape(X_train.shape[0], -1)
+#     smote = SMOTE()
+#     X_resampled, y_resampled = smote.fit_resample(X_train_reshaped, y_train)
+#     # Reshape X_resampled back to (num_samples, 3000, 1)
+#     X_resampled = X_resampled.reshape(-1, X_train.shape[1], 1)
+#     return X_resampled, y_resampled
 
 def data_generator_np(training_files, subject_files, batch_size):
     # Load original data
@@ -69,7 +76,7 @@ def data_generator_np(training_files, subject_files, batch_size):
         y_train = np.append(y_train, np.load(np_file)["y"])
 
     # Apply SMOTE
-    X_resampled, y_resampled = apply_smote(X_train, y_train)
+    X_resampled, y_resampled = apply_bd_smote(X_train, y_train)
 
     # Calculate data_count for class weights
     unique, counts = np.unique(y_resampled, return_counts=True)
