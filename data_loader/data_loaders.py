@@ -46,9 +46,9 @@ def data_generator_np(training_files, subject_files, batch_size):
     # Apply SMOTE
     X_resampled, y_resampled = apply_smote(X_train, y_train)
 
-    # Calculate data_count for class weights (optional, depending on requirements)
+    # Calculate data_count for class weights
     unique, counts = np.unique(y_resampled, return_counts=True)
-    data_count = dict(zip(unique, counts))
+    data_count = list(counts)  # Convert counts to a list
 
     # Create train dataset with SMOTE
     train_dataset = LoadDataset_from_numpy(X_resampled, y_resampled)
@@ -65,7 +65,7 @@ def data_generator_np(training_files, subject_files, batch_size):
         data = np.load(np_file)
         X_test.append(data["x"])
         y_test.append(data["y"])
-
+    
     X_test = np.vstack(X_test)
     y_test = np.concatenate(y_test)
 
@@ -77,3 +77,4 @@ def data_generator_np(training_files, subject_files, batch_size):
                                               num_workers=0)
 
     return train_loader, test_loader, data_count
+
