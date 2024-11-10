@@ -2,7 +2,6 @@ import torch
 from torch.utils.data import Dataset
 import os
 import numpy as np
-from imblearn.over_sampling import SMOTE
 
 class LoadDataset_from_numpy(Dataset):
     # Initialize your data, download, etc.
@@ -36,33 +35,15 @@ class LoadDataset_from_numpy(Dataset):
 
 
 def data_generator_np(training_files, subject_files, batch_size):
-    # Load the datasets
     train_dataset = LoadDataset_from_numpy(training_files)
     test_dataset = LoadDataset_from_numpy(subject_files)
 
-    # Reshape X_train to 2D before applying SMOTE
-    X_train, y_train = train_dataset.x_data.numpy(), train_dataset.y_data.numpy()
-    n_samples, n_channels, seq_len = X_train.shape
-    X_train_2d = X_train.reshape(n_samples, n_channels * seq_len)
-
-    # Apply SMOTE to the 2D reshaped data
-    smote = SMOTE(random_state=42)
-    X_train_oversampled, y_train_oversampled = smote.fit_resample(X_train_2d, y_train)
-
-    # Reshape back to 3D after SMOTE
-    X_train_oversampled = X_train_oversampled.reshape(-1, n_channels, seq_len)
-
-    # Convert back to PyTorch tensors
-    train_dataset.x_data = torch.from_numpy(X_train_oversampled).float()
-    train_dataset.y_data = torch.from_numpy(y_train_oversampled).long()
-
-    # Calculate class ratios for further class balancing if needed
-    all_ys = np.concatenate((y_train_oversampled, test_dataset.y_data.numpy()))
+    # to calculate the ratio for the CAL
+    all_ys = np.concatenate((train_dataset.y_data, test_dataset.y_data))
     all_ys = all_ys.tolist()
     num_classes = len(np.unique(all_ys))
     counts = [all_ys.count(i) for i in range(num_classes)]
 
-    # Create DataLoaders
     train_loader = torch.utils.data.DataLoader(dataset=train_dataset,
                                                batch_size=batch_size,
                                                shuffle=True,
