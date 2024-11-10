@@ -1,6 +1,6 @@
 {
-    "name": "Exp1",
-    "n_gpu": 1,
+    "name": "sleep_edf20_exp1",
+    "n_gpu": 4,
 
     "arch": {
         "type": "AttnSleep",
@@ -23,7 +23,8 @@
     },
     "loss": "weighted_CrossEntropyLoss",
     "metrics": [
-        "accuracy"
+        "accuracy",
+        "f1"
     ],
     "trainer": {
         "epochs": 100,
