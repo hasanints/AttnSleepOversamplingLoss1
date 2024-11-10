@@ -47,9 +47,9 @@ def main(config, fold_id):
 
     # build optimizer
     trainable_params = filter(lambda p: p.requires_grad, model.parameters())
-
     optimizer = config.init_obj('optimizer', torch.optim, trainable_params)
 
+    # Load data with SMOTE applied on training data only
     data_loader, valid_data_loader, data_count = data_generator_np(folds_data[fold_id][0],
                                                                    folds_data[fold_id][1], batch_size)
     weights_for_each_class = calc_class_weight(data_count)
