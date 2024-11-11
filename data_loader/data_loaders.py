@@ -31,28 +31,21 @@ def apply_bd_smote(X_train, y_train):
     """
     Menerapkan Borderline-SMOTE untuk menyeimbangkan data dengan rasio ρ = 2 untuk kelas minoritas.
     """
-    # Menghitung distribusi kelas sebelum SMOTE
     class_counts = Counter(y_train)
     print(f"Distribusi kelas sebelum SMOTE: {class_counts}")
     
-    # Identifikasi kelas minoritas, misalnya label 1 untuk kelas minoritas (sesuaikan jika perlu)
-    minority_class_label = 1  # Gantilah label ini jika kelas minoritas memiliki label berbeda
+    minority_class_label = 1  
     minority_class_count = class_counts[minority_class_label]
     
-    # Tentukan strategi sampling dengan rasio ρ = 2
     sampling_strategy = {minority_class_label: minority_class_count * 2}
     bd_smote = BorderlineSMOTE(random_state=42, sampling_strategy=sampling_strategy, k_neighbors=8)
-    
-    # Ubah bentuk X_train dari (841, 3000, 1) ke (841, 3000) agar kompatibel dengan SMOTE
+
     X_train_reshaped = X_train.reshape(X_train.shape[0], -1)
     
-    # Lakukan resampling
     X_resampled, y_resampled = bd_smote.fit_resample(X_train_reshaped, y_train)
-    
-    # Kembali ke bentuk asli (num_samples, 3000, 1)
+
     X_resampled = X_resampled.reshape(-1, X_train.shape[1], 1)
-    
-    # Tampilkan distribusi kelas setelah SMOTE
+
     print(f"Distribusi kelas setelah SMOTE: {Counter(y_resampled)}")
     
     return X_resampled, y_resampled
