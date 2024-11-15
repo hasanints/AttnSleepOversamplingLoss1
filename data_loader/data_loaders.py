@@ -31,27 +31,22 @@ class LoadDataset_from_numpy(Dataset):
 
 
 def apply_bd_smote(X_train, y_train):
-    """
-    Menerapkan Borderline-SMOTE untuk menyeimbangkan data dengan rasio ρ = 2 untuk kelas minoritas.
-    """
     class_counts = Counter(y_train)
     print(f"Distribusi kelas sebelum SMOTE: {class_counts}")
     
-    minority_class_label = 1  
+    minority_class_label = min(class_counts, key=class_counts.get)  # Otomatis mendeteksi kelas minoritas
     minority_class_count = class_counts[minority_class_label]
     
     sampling_strategy = {minority_class_label: minority_class_count * 2}
     bd_smote = BorderlineSMOTE(random_state=42, sampling_strategy=sampling_strategy, k_neighbors=8)
 
     X_train_reshaped = X_train.reshape(X_train.shape[0], -1)
-    
     X_resampled, y_resampled = bd_smote.fit_resample(X_train_reshaped, y_train)
-
-    X_resampled = X_resampled.reshape(-1, X_train.shape[1], 1)
+    X_resampled = X_resampled.reshape(-1, X_train.shape[1], X_train.shape[2])
 
     print(f"Distribusi kelas setelah SMOTE: {Counter(y_resampled)}")
-    
     return X_resampled, y_resampled
+
 
 # def apply_smote(X_train, y_train):
 #     # Reshape X_train from (841, 3000, 1) to (841, 3000) for SMOTE
@@ -104,6 +99,7 @@ def data_generator_np(training_files, subject_files, batch_size):
                                               shuffle=False,
                                               drop_last=False,
                                               num_workers=0)
+    print(f"Distribusi Kelas Testing: {Counter(y_test)}")
 
     return train_loader, test_loader, data_count
 

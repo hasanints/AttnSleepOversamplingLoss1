@@ -55,11 +55,18 @@ def main(config, fold_id):
     weights_for_each_class = calc_class_weight(data_count)
 
     trainer = Trainer(model, criterion, metrics, optimizer,
-                      config=config,
-                      data_loader=data_loader,
-                      fold_id=fold_id,
-                      valid_data_loader=valid_data_loader,
-                      class_weights=weights_for_each_class)
+                    config=config,
+                    data_loader=data_loader,
+                    fold_id=fold_id,
+                    valid_data_loader=valid_data_loader,
+                    class_weights=None)
+
+    # trainer = Trainer(model, criterion, metrics, optimizer,
+    #                   config=config,
+    #                   data_loader=data_loader,
+    #                   fold_id=fold_id,
+    #                   valid_data_loader=valid_data_loader,
+    #                   class_weights=weights_for_each_class)
 
     trainer.train()
 
