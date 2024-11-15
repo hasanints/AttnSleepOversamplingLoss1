@@ -3,6 +3,9 @@ from torch.utils.data import Dataset
 import numpy as np
 from collections import Counter
 from imblearn.over_sampling import BorderlineSMOTE
+from imblearn.over_sampling import SMOTE
+from imblearn.pipeline import Pipeline, make_pipeline
+
 
 class LoadDataset_from_numpy(Dataset):
     def __init__(self, X_data, y_data):
@@ -53,11 +56,12 @@ def apply_bd_smote(X_train, y_train):
 # def apply_smote(X_train, y_train):
 #     # Reshape X_train from (841, 3000, 1) to (841, 3000) for SMOTE
 #     X_train_reshaped = X_train.reshape(X_train.shape[0], -1)
-#     smote = SMOTE()
+#     smote = SMOTE(random_state=42)
 #     X_resampled, y_resampled = smote.fit_resample(X_train_reshaped, y_train)
 #     # Reshape X_resampled back to (num_samples, 3000, 1)
 #     X_resampled = X_resampled.reshape(-1, X_train.shape[1], 1)
 #     return X_resampled, y_resampled
+
 
 def data_generator_np(training_files, subject_files, batch_size):
     # Load original data
