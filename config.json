@@ -1,5 +1,5 @@
 {
-    "name": "sleep_edf20_exp1",
+    "name": "sleep_edf20_smote_exp1",
     "n_gpu": 4,
 
     "arch": {
@@ -23,8 +23,7 @@
     },
     "loss": "CrossEntropyLoss",
     "metrics": [
-        "accuracy",
-        "f1"
+        "accuracy"
     ],
     "trainer": {
         "epochs": 100,

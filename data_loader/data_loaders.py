@@ -29,23 +29,45 @@ class LoadDataset_from_numpy(Dataset):
 
 
 
-
-def apply_bd_smote(X_train, y_train):
+def apply_smote(X_train, y_train):
+    # Melihat distribusi kelas sebelum SMOTE
     class_counts = Counter(y_train)
     print(f"Distribusi kelas sebelum SMOTE: {class_counts}")
     
-    minority_class_label = min(class_counts, key=class_counts.get)  # Otomatis mendeteksi kelas minoritas
-    minority_class_count = class_counts[minority_class_label]
+    # Inisialisasi SMOTE
+    smote = SMOTE(random_state=42)  # Menggunakan default sampling_strategy (otomatis seimbang)
     
-    sampling_strategy = {minority_class_label: minority_class_count * 2}
-    bd_smote = BorderlineSMOTE(random_state=42, sampling_strategy=sampling_strategy, k_neighbors=8)
-
+    # Ubah data menjadi 2D untuk kompatibilitas dengan SMOTE
     X_train_reshaped = X_train.reshape(X_train.shape[0], -1)
-    X_resampled, y_resampled = bd_smote.fit_resample(X_train_reshaped, y_train)
+    
+    # Terapkan SMOTE untuk oversampling kelas minoritas
+    X_resampled, y_resampled = smote.fit_resample(X_train_reshaped, y_train)
+    
+    # Kembalikan data ke bentuk 3D seperti aslinya
     X_resampled = X_resampled.reshape(-1, X_train.shape[1], X_train.shape[2])
-
+    
+    # Melihat distribusi kelas setelah SMOTE
     print(f"Distribusi kelas setelah SMOTE: {Counter(y_resampled)}")
+    
     return X_resampled, y_resampled
+
+
+# def apply_bd_smote(X_train, y_train):
+#     class_counts = Counter(y_train)
+#     print(f"Distribusi kelas sebelum SMOTE: {class_counts}")
+    
+#     minority_class_label = min(class_counts, key=class_counts.get)  # Otomatis mendeteksi kelas minoritas
+#     minority_class_count = class_counts[minority_class_label]
+    
+#     sampling_strategy = {minority_class_label: minority_class_count * 2}
+#     bd_smote = BorderlineSMOTE(random_state=42, sampling_strategy=sampling_strategy, k_neighbors=8)
+
+#     X_train_reshaped = X_train.reshape(X_train.shape[0], -1)
+#     X_resampled, y_resampled = bd_smote.fit_resample(X_train_reshaped, y_train)
+#     X_resampled = X_resampled.reshape(-1, X_train.shape[1], X_train.shape[2])
+
+#     print(f"Distribusi kelas setelah SMOTE: {Counter(y_resampled)}")
+#     return X_resampled, y_resampled
 
 
 # def apply_smote(X_train, y_train):
