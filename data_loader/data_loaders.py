@@ -5,6 +5,7 @@ from collections import Counter
 from imblearn.over_sampling import BorderlineSMOTE
 from imblearn.over_sampling import SMOTE
 from imblearn.pipeline import Pipeline, make_pipeline
+from imblearn.combine import SMOTEENN
 
 
 class LoadDataset_from_numpy(Dataset):
@@ -29,27 +30,52 @@ class LoadDataset_from_numpy(Dataset):
 
 
 
-def apply_smote(X_train, y_train):
-    # Melihat distribusi kelas sebelum SMOTE
+
+def apply_smote_enn(X_train, y_train):
+    # Melihat distribusi kelas sebelum SMOTE-ENN
     class_counts = Counter(y_train)
-    print(f"Distribusi kelas sebelum SMOTE: {class_counts}")
+    print(f"Distribusi kelas sebelum SMOTE-ENN: {class_counts}")
     
-    # Inisialisasi SMOTE
-    smote = SMOTE(random_state=42)  # Menggunakan default sampling_strategy (otomatis seimbang)
+    # Inisialisasi SMOTE-ENN
+    smote_enn = SMOTEENN(random_state=42)
     
-    # Ubah data menjadi 2D untuk kompatibilitas dengan SMOTE
-    X_train_reshaped = X_train.reshape(X_train.shape[0], -1)
+    # Ubah data menjadi 2D untuk kompatibilitas dengan SMOTE-ENN
+    X_train_reshaped = X_train.reshape(X_train.shape[0], -1)  # Mengubah menjadi 2D
     
-    # Terapkan SMOTE untuk oversampling kelas minoritas
-    X_resampled, y_resampled = smote.fit_resample(X_train_reshaped, y_train)
+    # Terapkan SMOTE-ENN
+    X_resampled, y_resampled = smote_enn.fit_resample(X_train_reshaped, y_train)
     
     # Kembalikan data ke bentuk 3D seperti aslinya
     X_resampled = X_resampled.reshape(-1, X_train.shape[1], X_train.shape[2])
     
-    # Melihat distribusi kelas setelah SMOTE
-    print(f"Distribusi kelas setelah SMOTE: {Counter(y_resampled)}")
+    # Melihat distribusi kelas setelah SMOTE-ENN
+    print(f"Distribusi kelas setelah SMOTE-ENN: {Counter(y_resampled)}")
     
     return X_resampled, y_resampled
+
+
+
+# def apply_smote(X_train, y_train):
+#     # Melihat distribusi kelas sebelum SMOTE
+#     class_counts = Counter(y_train)
+#     print(f"Distribusi kelas sebelum SMOTE: {class_counts}")
+    
+#     # Inisialisasi SMOTE
+#     smote = SMOTE(random_state=42)  # Menggunakan default sampling_strategy (otomatis seimbang)
+    
+#     # Ubah data menjadi 2D untuk kompatibilitas dengan SMOTE
+#     X_train_reshaped = X_train.reshape(X_train.shape[0], -1)
+    
+#     # Terapkan SMOTE untuk oversampling kelas minoritas
+#     X_resampled, y_resampled = smote.fit_resample(X_train_reshaped, y_train)
+    
+#     # Kembalikan data ke bentuk 3D seperti aslinya
+#     X_resampled = X_resampled.reshape(-1, X_train.shape[1], X_train.shape[2])
+    
+#     # Melihat distribusi kelas setelah SMOTE
+#     print(f"Distribusi kelas setelah SMOTE: {Counter(y_resampled)}")
+    
+#     return X_resampled, y_resampled
 
 
 # def apply_bd_smote(X_train, y_train):
@@ -90,7 +116,7 @@ def data_generator_np(training_files, subject_files, batch_size):
         y_train = np.append(y_train, np.load(np_file)["y"])
 
     # Apply SMOTE
-    X_resampled, y_resampled = apply_smote(X_train, y_train)
+    X_resampled, y_resampled = apply_smote_enn(X_train, y_train)
 
     # Calculate data_count for class weights
     unique, counts = np.unique(y_resampled, return_counts=True)
