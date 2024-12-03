@@ -32,61 +32,61 @@ class LoadDataset_from_numpy(Dataset):
 from imblearn.over_sampling import ADASYN
 from collections import Counter
 
-def apply_adasyn_1_3(X_train, y_train):
-    # Melihat distribusi kelas sebelum SMOTE
-    class_counts = Counter(y_train)
-    print(f"Distribusi kelas sebelum ADASYN: {class_counts}")
-    
-    # Menentukan kelas yang ingin dioversample (kelas 1) dengan perbandingan 1:3 terhadap kelas 2
-    class_2_count = class_counts[2]
-    sampling_strategy = {1: class_2_count // 3}  # Kelas 1 akan dioversample hingga sepertiga jumlah kelas 2
-    
-    # Inisialisasi ADASYN
-    adasyn = ADASYN(sampling_strategy=sampling_strategy, random_state=42)  # oversample kelas 1 menjadi sepertiga kelas 2
-    
-    # Ubah data menjadi 2D untuk kompatibilitas dengan ADASYN
-    X_train_reshaped = X_train.reshape(X_train.shape[0], -1)
-    
-    # Terapkan SMOTE untuk oversampling kelas 1
-    X_resampled, y_resampled = adasyn.fit_resample(X_train_reshaped, y_train)
-    
-    # Kembalikan data ke bentuk 3D seperti aslinya
-    X_resampled = X_resampled.reshape(-1, X_train.shape[1], X_train.shape[2])
-    
-    # Melihat distribusi kelas setelah ADASYN
-    print(f"Distribusi kelas setelah ADASYN: {Counter(y_resampled)}")
-    
-    return X_resampled, y_resampled
-
-# from imblearn.over_sampling import SMOTE
-# from collections import Counter
-
-# def apply_smote_1_1(X_train, y_train):
+# def apply_adasyn_1_3(X_train, y_train):
 #     # Melihat distribusi kelas sebelum SMOTE
 #     class_counts = Counter(y_train)
-#     print(f"Distribusi kelas sebelum SMOTE: {class_counts}")
+#     print(f"Distribusi kelas sebelum ADASYN: {class_counts}")
     
-#     # Menentukan kelas yang ingin dioversample (kelas 1)
-#     # Set sampling_strategy ke {1: jumlah kelas 2}, sehingga kelas 1 akan dioversample hingga sama banyaknya dengan kelas 2
+#     # Menentukan kelas yang ingin dioversample (kelas 1) dengan perbandingan 1:3 terhadap kelas 2
 #     class_2_count = class_counts[2]
-#     sampling_strategy = {1: class_2_count}
+#     sampling_strategy = {1: class_2_count // 3}  # Kelas 1 akan dioversample hingga sepertiga jumlah kelas 2
     
-#     # Inisialisasi SMOTE
-#     smote = SMOTE(sampling_strategy=sampling_strategy, random_state=42)  # oversample kelas 1 agar jumlahnya sama dengan kelas 2
+#     # Inisialisasi ADASYN
+#     adasyn = ADASYN(sampling_strategy=sampling_strategy, random_state=42)  # oversample kelas 1 menjadi sepertiga kelas 2
     
-#     # Ubah data menjadi 2D untuk kompatibilitas dengan SMOTE
+#     # Ubah data menjadi 2D untuk kompatibilitas dengan ADASYN
 #     X_train_reshaped = X_train.reshape(X_train.shape[0], -1)
     
 #     # Terapkan SMOTE untuk oversampling kelas 1
-#     X_resampled, y_resampled = smote.fit_resample(X_train_reshaped, y_train)
+#     X_resampled, y_resampled = adasyn.fit_resample(X_train_reshaped, y_train)
     
 #     # Kembalikan data ke bentuk 3D seperti aslinya
 #     X_resampled = X_resampled.reshape(-1, X_train.shape[1], X_train.shape[2])
     
-#     # Melihat distribusi kelas setelah SMOTE
-#     print(f"Distribusi kelas setelah SMOTE: {Counter(y_resampled)}")
+#     # Melihat distribusi kelas setelah ADASYN
+#     print(f"Distribusi kelas setelah ADASYN: {Counter(y_resampled)}")
     
 #     return X_resampled, y_resampled
+
+from imblearn.over_sampling import SMOTE
+from collections import Counter
+
+def apply_smote_1_3(X_train, y_train):
+    # Melihat distribusi kelas sebelum SMOTE
+    class_counts = Counter(y_train)
+    print(f"Distribusi kelas sebelum SMOTE: {class_counts}")
+    
+    # Menentukan kelas yang ingin dioversample (kelas 1)
+    # Set sampling_strategy ke {1: jumlah kelas 2}, sehingga kelas 1 akan dioversample hingga sama banyaknya dengan kelas 2
+    class_2_count = class_counts[2]
+    sampling_strategy = {1: class_2_count // 3}
+    
+    # Inisialisasi SMOTE
+    smote = SMOTE(sampling_strategy=sampling_strategy, random_state=42)  # oversample kelas 1 agar jumlahnya sama dengan kelas 2
+    
+    # Ubah data menjadi 2D untuk kompatibilitas dengan SMOTE
+    X_train_reshaped = X_train.reshape(X_train.shape[0], -1)
+    
+    # Terapkan SMOTE untuk oversampling kelas 1
+    X_resampled, y_resampled = smote.fit_resample(X_train_reshaped, y_train)
+    
+    # Kembalikan data ke bentuk 3D seperti aslinya
+    X_resampled = X_resampled.reshape(-1, X_train.shape[1], X_train.shape[2])
+    
+    # Melihat distribusi kelas setelah SMOTE
+    print(f"Distribusi kelas setelah SMOTE: {Counter(y_resampled)}")
+    
+    return X_resampled, y_resampled
 
 
 
@@ -201,7 +201,7 @@ def data_generator_np(training_files, subject_files, batch_size):
         y_train = np.append(y_train, np.load(np_file)["y"])
 
     # Apply SMOTE
-    X_resampled, y_resampled = apply_adasyn_1_3(X_train, y_train)
+    X_resampled, y_resampled = apply_smote_1_3(X_train, y_train)
 
     # Calculate data_count for class weights
     unique, counts = np.unique(y_resampled, return_counts=True)
