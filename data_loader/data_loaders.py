@@ -32,14 +32,14 @@ class LoadDataset_from_numpy(Dataset):
 from imblearn.over_sampling import ADASYN
 from collections import Counter
 
-def apply_adasyn_1_1(X_train, y_train):
+def apply_adasyn_1_3(X_train, y_train):
     # Melihat distribusi kelas sebelum SMOTE
     class_counts = Counter(y_train)
     print(f"Distribusi kelas sebelum ADASYN: {class_counts}")
     
     # Menentukan kelas yang ingin dioversample (kelas 1) dengan perbandingan 1:3 terhadap kelas 2
     class_2_count = class_counts[2]
-    sampling_strategy = {1: class_2_count}  # Kelas 1 akan dioversample hingga sepertiga jumlah kelas 2
+    sampling_strategy = {1: class_2_count // 3}  # Kelas 1 akan dioversample hingga sepertiga jumlah kelas 2
     
     # Inisialisasi ADASYN
     adasyn = ADASYN(sampling_strategy=sampling_strategy, random_state=42)  # oversample kelas 1 menjadi sepertiga kelas 2
@@ -201,7 +201,7 @@ def data_generator_np(training_files, subject_files, batch_size):
         y_train = np.append(y_train, np.load(np_file)["y"])
 
     # Apply SMOTE
-    X_resampled, y_resampled = apply_adasyn_1_1(X_train, y_train)
+    X_resampled, y_resampled = apply_adasyn_1_3(X_train, y_train)
 
     # Calculate data_count for class weights
     unique, counts = np.unique(y_resampled, return_counts=True)
